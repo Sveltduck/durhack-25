@@ -1,7 +1,7 @@
-import type { Actions } from './$types';
+import type {Actions} from './$types';
 import {prisma} from "$lib/server/prisma";
 import {redirect} from "@sveltejs/kit";
-
+import {error} from "@sveltejs/kit";
 
 
 export const actions = {
@@ -14,34 +14,59 @@ export const actions = {
 } satisfies Actions;
 
 function parseNum(data: FormDataEntryValue | null) {
-    return Number.parseInt(data as string);
+    const num = Number.parseInt(data as string);
+    if (isNaN(num)) {
+        error(403,"Invalid number")
+    }
+    return num
 }
 
 function parseList(data: FormDataEntryValue | null) {
-    return data
-        ? (data as string).split(",").map(s => s.trim()).filter(Boolean)
-        : [];
+    if (!data) return [];
+    let jsonData: any
+    try {
+        jsonData = JSON.parse(data as string);
+    } catch {
+        error(403, "Invalid data")
+    }
+    if (!Array.isArray(jsonData)) {
+        error(403, "Invalid data")
+    }
+    for (const item of jsonData) {
+        if (typeof item !== "string") {
+            error(403, "Invalid data")
+        }
+    }
+    return jsonData;
+}
+
+function parseString(data: FormDataEntryValue | null) {
+    const str = data as string;
+    if (str == null) {
+        error(403,"Invalid string")
+    }
+    return str;
 }
 
 function formToDatabase(data: FormData): void {
-    const name = data.get("name") as string;
-    const studentId = data.get("student-id") as string;
-    const gender = data.get("gender") as string;
+    const name = parseString(data.get("name"))
+    const studentId = parseString(data.get("student-id"))
+    const gender = parseString(data.get("gender"))
     const workStartTime = parseNum(data.get("work-start"));
     const workEndTime = parseNum(data.get("work-end"));
     const nightOutBedtime = parseNum(data.get("night-out-bedtime"));
     const normalWeekdayBedtime = parseNum(data.get("normal-weekday-bedtime"));
     const normalWeekdayStartTime = parseNum(data.get("normal-weekday-waketime"));
-    const overnightGuests = data.get("overnight-guests") as string;
-    const introvertExtrovert = data.get("introvert-extrovert") as string;
+    const overnightGuests = parseString(data.get("overnight-guests"))
+    const introvertExtrovert = parseString(data.get("introvert-extrovert"))
     const tidiness = parseNum(data.get("care-about-tidiness"));
     const careAboutTidiness = parseNum(data.get("tidiness"));
     const sportsWatched = parseList(data.get("sports-watched"));
     const sportsPlayed = parseList(data.get("sports-played"));
     const musicGenres = parseList(data.get("music-genres"));
     const musicArtists = parseList(data.get("music-artists"));
-    const idealRoommate = data.get("ideal-roommate-description") as string;
-    const selfDescription = data.get("self-description") as string;
+    const idealRoommate = parseString(data.get("ideal-roommate-description"))
+    const selfDescription = parseString(data.get("self-description"))
 
 
     prisma.user.create({
