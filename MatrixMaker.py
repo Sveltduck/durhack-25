@@ -119,7 +119,7 @@ def getBestMatches(n,matrix,entryOrder):
 
     numsInOrder=sorted(compDict.items(),key=lambda item:item[1],reverse=True)
     numsInOrder=([numbersToNames[x[0]] for x in numsInOrder[:-1]])
-    return numsInOrder
+    return numsInOrder[:5]
   
 
 
