@@ -1,7 +1,7 @@
-import type { Actions } from './$types';
+import type {Actions} from './$types';
 import {prisma} from "$lib/server/prisma";
 import {redirect} from "@sveltejs/kit";
-
+import {error} from "@sveltejs/kit";
 
 
 export const actions = {
@@ -13,39 +13,59 @@ export const actions = {
     }
 } satisfies Actions;
 
+function parseNum(data: FormDataEntryValue | null) {
+    const num = Number.parseInt(data as string);
+    if (isNaN(num)) {
+        error(403,"Invalid number")
+    }
+    return num
+}
+
+function parseList(data: FormDataEntryValue | null) {
+    let jsonData: any
+    try {
+        jsonData = JSON.parse(data as string);
+    } catch {
+        error(403, "Invalid data")
+    }
+    if (!Array.isArray(jsonData)) {
+        error(403, "Invalid data")
+    }
+    for (const item of jsonData) {
+        if (typeof item !== "string") {
+            error(403, "Invalid data")
+        }
+    }
+    return jsonData;
+}
+
+function parseString(data: FormDataEntryValue | null) {
+    const str = data as string;
+    if (str == null) {
+        error(403,"Invalid string")
+    }
+    return str;
+}
+
 function formToDatabase(data: FormData): void {
-
-
-    const workStartTimeString = data.get("work-start") as string;
-    const workEndTimeString = data.get("work-end") as string;
-    const nightOutBedtimeString = data.get("night-out-bedtime") as string;
-    const normalWeekdayBedtimeString = data.get("normal-weekday-bedtime") as string;
-    const normalWeekdayStartTimeString = data.get("normal-weekday-waketime") as string;
-    const tidinessString = data.get("tidiness") as string;
-    const careAboutTidinessString = data.get("care-about-tidiness") as string;
-    const sportsWatchedString = data.get("sports-watched") as string;
-    const sportsPlayedString = data.get("sports-played") as string;
-    const musicGenresString = data.get("music-genres") as string;
-    const musicArtistsString = data.get("music-artists") as string;
-
-    const name = data.get("name") as string;
-    const studentId = data.get("student-id") as string;
-    const gender = data.get("gender") as string;
-    const workStartTime = Number.parseInt(workStartTimeString);
-    const workEndTime = Number.parseInt(workEndTimeString);
-    const nightOutBedtime = Number.parseInt(nightOutBedtimeString);
-    const normalWeekdayBedtime = Number.parseInt(normalWeekdayBedtimeString);
-    const normalWeekdayStartTime = Number.parseInt(normalWeekdayStartTimeString);
-    const overnightGuests = data.get("overnight-guests") as string;
-    const introvertExtrovert = data.get("introvert-extrovert") as string;
-    const tidiness = Number.parseInt(tidinessString);
-    const careAboutTidiness = Number.parseInt(careAboutTidinessString);
-    const sportsWatched = sportsWatchedString.split(",")
-    const sportsPlayed = sportsPlayedString.split(",")
-    const musicGenres = musicGenresString.split(",")
-    const musicArtists = musicArtistsString.split(",")
-    const idealRoommate = data.get("ideal-roommate-description") as string;
-    const selfDescription = data.get("self-description") as string;
+    const name = parseString(data.get("name"))
+    const studentId = parseString(data.get("student-id"))
+    const gender = parseString(data.get("gender"))
+    const workStartTime = parseNum(data.get("work-start"));
+    const workEndTime = parseNum(data.get("work-end"));
+    const nightOutBedtime = parseNum(data.get("night-out-bedtime"));
+    const normalWeekdayBedtime = parseNum(data.get("normal-weekday-bedtime"));
+    const normalWeekdayStartTime = parseNum(data.get("normal-weekday-waketime"));
+    const overnightGuests = parseString(data.get("overnight-guests"))
+    const introvertExtrovert = parseString(data.get("introvert-extrovert"))
+    const tidiness = parseNum(data.get("care-about-tidiness"));
+    const careAboutTidiness = parseNum(data.get("tidiness"));
+    const sportsWatched = parseList(data.get("sports-watched"));
+    const sportsPlayed = parseList(data.get("sports-played"));
+    const musicGenres = parseList(data.get("music-genres"));
+    const musicArtists = parseList(data.get("music-artists"));
+    const idealRoommate = parseString(data.get("ideal-roommate-description"))
+    const selfDescription = parseString(data.get("self-description"))
 
 
     prisma.user.create({
