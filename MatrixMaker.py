@@ -1,4 +1,6 @@
 from datetime import datetime
+import numpy as np 
+import networkx as nx
 
 def overnightGuest(answer1, answer2):
     #that's fine = 2, I'd rather they didn't = 1, no way = 0
@@ -83,6 +85,43 @@ def finalCompatibility(person1, person2):
     times = timingCompatibility(sleep1, sleep2, wake1, wake2, earliestwork1, earliestwork2, latestwork1, latestwork2, nightOutsleep1, nightOutsleep2)
     compatibility = (guest + music +sport +personality + cleanliness + times)
     return compatibility
+
+
+
+def averageMatrix(tab):
+    mat=[["" for y in range(len(tab))] for x in range(len(tab))  ]
+
+
+    for i in range(len(tab)):
+
+        for j in range(i,len(tab)):
+            a= (tab[i][j] +tab[j][i])/2
+            mat[i][j],mat[j][i]=a,a
+    return np.array(mat) 
+
+def getRoomates(matrix, entryOrder):
+
+    numbersToNames=dict(zip([x for x in range(len(entryOrder))], entryOrder))
+
+
+    G=nx.from_numpy_array(averageMatrix(matrix))
+    a=nx.max_weight_matching(G, maxcardinality=False)
+    named=[]
+    for item in a :
+        named.append((numbersToNames[item[0]], numbersToNames[item[1]])    )
+       
+    print(named)
+    return named
+
+def getBestMatches(n,matrix,entryOrder):
+    numbersToNames=dict(zip([x for x in range(len(entryOrder))], entryOrder))
+    compDict= dict(zip([x for x in range(len(matrix[n]))] ,matrix[n] )) 
+
+    numsInOrder=sorted(compDict.items(),key=lambda item:item[1],reverse=True)
+    numsInOrder=([numbersToNames[x[0]] for x in numsInOrder[:-1]])
+    return numsInOrder
+  
+
 
 
 
