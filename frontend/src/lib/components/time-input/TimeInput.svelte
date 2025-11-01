@@ -21,8 +21,11 @@
             bind:value
             float pips pipstep={6} spring={false} all="label"
             style="
-                --slider-bg: #fff;
-                --range-pip-text: #fff;
+                --slider-bg: #999;
+                --handle-inactive: #fff;
+                --range-pip-text: #999;
+                --range-pip-active-text: #eee;
+                --range-pip-hover-text: #fff;
             "
             formatter={timeNumberToString}
     />
