@@ -137,6 +137,20 @@
             I like the following music artists: (separate with commas)
             <input type="text" name="music-artists" placeholder="e.g. The Beatles, Beyoncé" />
         </label>
+        <br>
+
+        <label>
+            I would describe myself as:
+            <br>
+            <textarea name="self-description" rows="4" cols="50" placeholder="e.g. friendly, studious, tidy"></textarea>
+        </label>
+        <br>
+
+        <label>
+            My ideal roommate would describe themselves as:
+            <br>
+            <textarea name="ideal-roommate-description" rows="4" cols="50" placeholder="e.g. respectful, outgoing, clean"></textarea>
+        </label>
     </fieldset>
 
     <button type="submit">Submit!</button>
