@@ -1,65 +1,62 @@
 <script lang="ts">
-    import {onMount} from "svelte";
+import {onMount} from "svelte";
 
-    let main: HTMLElement;
-    let text: HTMLElement;
+let opacity = 0;
 
-    let lastX = 0;
-    let lastY = 0;
-    let revealScore = 0;
-    let lastTime = Date.now();
-    let fullyRevealed = false;
+const SPEED_MULTIPLIER = 1;
 
-    onMount(() => {
-        // Animation loop — fade in until fully revealed
-        setInterval(() => {
-            // Only update if not fully revealed
-            if (!fullyRevealed) {
-                // gentle decay so user must keep moving to build score
-                revealScore *= 0.97;
-                if (revealScore < 0.01) revealScore = 0;
+let lastX = 0;
+let lastY = 0;
+let revealScore = 0;
+let lastTime = Date.now();
 
-                const opacity = Math.min(revealScore / 100, 1);
-                text.style.opacity = opacity;
+let animationInterval: NodeJS.Timeout;
 
-                // Once fully visible, lock it in
-                if (opacity >= 1) {
-                    fullyRevealed = true;
-                    text.style.opacity = 1;
-                }
-            }
-        }, 50);
+function onMouseMove(event: MouseEvent) {
+    if (!animationInterval) return; // already fully revealed
 
-        main.addEventListener("mousemove", (event) => {
-            if (fullyRevealed) return; // Stop processing once revealed
+    const now = Date.now();
+    const dt = now - lastTime || 16; // fallback to ~60fps interval
 
-            const now = Date.now();
-            const dt = now - lastTime || 16; // fallback to ~60fps interval
+    const dx = event.clientX - lastX;
+    const dy = event.clientY - lastY;
+    const speed = Math.sqrt(dx * dx + dy * dy) / dt;
 
-            const dx = event.clientX - lastX;
-            const dy = event.clientY - lastY;
-            const speed = Math.sqrt(dx * dx + dy * dy) / dt;
+    // Increase score while moving quickly
+    if (speed > 0.3) {
+        revealScore += speed * SPEED_MULTIPLIER;
+    }
 
-            // Increase score while moving quickly
-            if (speed > 0.3) {
-                revealScore += speed * 1; // you can reduce multiplier to make reveal slower
-            }
+    // clamp
+    revealScore = Math.min(Math.max(revealScore, 0), 100);
 
-            // clamp
-            revealScore = Math.min(Math.max(revealScore, 0), 100);
+    lastX = event.clientX;
+    lastY = event.clientY;
+    lastTime = now;
+}
 
-            lastX = event.clientX;
-            lastY = event.clientY;
-            lastTime = now;
-        });
-    });
+onMount(() => {
+    // Animation loop — fade in until fully revealed
+    animationInterval = setInterval(() => {
+        // gentle decay so user must keep moving to build score
+        opacity = Math.min(revealScore / 100, 1);
+
+        revealScore *= 0.97;
+        if (revealScore < 0.01) revealScore = 0;
+
+        // Once fully visible, lock it in
+        if (opacity >= 1) {
+            clearInterval(animationInterval);
+        }
+    }, 50);
+});
 </script>
 
 <h1>Results</h1>
-<p id = "toptext">Leave a great Legacy</p>
-<div id="main" bind:this={main}>
-  <img id="crystalBall" src="https://media.istockphoto.com/id/933666298/photo/hands-on-crystal-ball-and-cryptocurrency.jpg?s=612x612&w=0&k=20&c=rWJ_caa0AZCHYB09wkcLRghIYGZmGqfYe8D2l1JNZE8=">
-  <p id="result" bind:this={text}>This is your Roommate!</p>
+<p id="toptext">Leave a great Legacy</p>
+<div id="main">
+  <img onmousemove={onMouseMove} id="crystalBall" alt="Crystal ball" src="https://media.istockphoto.com/id/933666298/photo/hands-on-crystal-ball-and-cryptocurrency.jpg?s=612x612&w=0&k=20&c=rWJ_caa0AZCHYB09wkcLRghIYGZmGqfYe8D2l1JNZE8=">
+  <p id="result" style:opacity={opacity}>This is your Roommate!</p>
 </div>
 
 <style>
@@ -72,7 +69,7 @@ h1{
   text-align: center;
   font-family: "Momo Signature", cursive;
   font-size: 50px;
-  margin:0px
+  margin: 0;
 }
 
 #toptext {
