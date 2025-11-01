@@ -57,8 +57,8 @@
             <br>
 
             <label>
-                On a normal weekday I would go to bed at
-                <TimeInput name="normal-weekday-bedtime" defaultValue={42} />
+                On a normal weekday I would get up at
+                <TimeInput name="normal-weekday-waketime" defaultValue={16} />
             </label>
             <br>
 
