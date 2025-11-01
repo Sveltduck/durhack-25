@@ -20,12 +20,16 @@
             min={0} max={47} step={1}
             bind:value
             float pips pipstep={6} spring={false} all="label"
+            style="
+                --slider-bg: #fff;
+                --range-pip-text: #fff;
+            "
             formatter={timeNumberToString}
     />
 </div>
 
 <style>
     div {
-        margin: 0 .5em;
+        width: 30em;
     }
 </style>
