@@ -22,7 +22,6 @@ function parseNum(data: FormDataEntryValue | null) {
 }
 
 function parseList(data: FormDataEntryValue | null) {
-    if (!data) return [];
     let jsonData: any
     try {
         jsonData = JSON.parse(data as string);
