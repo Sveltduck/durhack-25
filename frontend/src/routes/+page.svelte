@@ -1,12 +1,13 @@
-<script lang="ts">
-
-import HalfHourTimeInput from "$lib/components/HalfHourTimeInput.svelte";
+<script>
+    import TimeRangeInput from "$lib/components/time-input/TimeRangeInput.svelte";
+    import TimeInput from "$lib/components/time-input/TimeInput.svelte";
 </script>
 
 <h1>And They Were Roommates</h1>
 <!-- TODO: In future, submitting details will require authentication -->
 <p>Enter your details below to get started. These details will be used to match you with a compatible roommate.</p>
 <form>
+    <div class = "QBox">
     <h2>Basic Information</h2>
     <label>
         Name:
@@ -30,34 +31,32 @@ import HalfHourTimeInput from "$lib/components/HalfHourTimeInput.svelte";
             <option value="prefer-not-to-say">Prefer not to say</option>
         </select>
     </label>
+    </div>
 
-
+    <div class = "QBox">
     <h2>Timings</h2>
-    <!-- In future, a lot of these pairs could be combined into a double range slider -->
 
     <label>
         I am likely to only work between
-        <HalfHourTimeInput name="work-start" />
-        and
-        <HalfHourTimeInput name="work-end" />
+        <TimeRangeInput lowerTimeName="work-start" upperTimeName="work-end" />
     </label>
     <br>
 
     <label>
         On a night out I would go to bed at
-        <HalfHourTimeInput name="night-out-bedtime" />
+        <TimeInput name="night-out-bedtime" defaultValue={48} />
     </label>
     <br>
 
     <label>
         On a quiet weekday I would go to bed at
-        <HalfHourTimeInput name="quiet-weekday-bedtime" />
+        <TimeInput name="quiet-weekday-bedtime" defaultValue={42} />
     </label>
     <br>
 
     <label>
         On a normal weekday I would go to bed at
-        <HalfHourTimeInput name="normal-weekday-bedtime" />
+        <TimeInput name="normal-weekday-bedtime" defaultValue={42} />
     </label>
     <br>
 
@@ -72,7 +71,9 @@ import HalfHourTimeInput from "$lib/components/HalfHourTimeInput.svelte";
         people staying overnight
     </label>
     <br>
+    </div>
 
+    <div class = "QBox">
     <h2>Personality</h2>
 
     <label>
@@ -138,6 +139,35 @@ import HalfHourTimeInput from "$lib/components/HalfHourTimeInput.svelte";
         <input type="text" name="music-artists" placeholder="e.g. The Beatles, Beyoncé" />
     </label>
     <br>
+    </div>
 
     <button type="submit">Submit</button>
 </form>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Momo+Trust+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Momo+Trust+Display&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+    :global(body) {
+        background-color: #DEE2B1;
+    }
+
+    h1{
+        text-align:center;
+        color:#155332;
+        font-family: "Momo Trust Display"
+    }
+
+    p, label, h2, select, input {
+        font-family: "Open Sans", sans-serif;
+    }
+
+    p {
+        text-align: center
+    }
+
+    .QBox {
+        border: 20px #155332;
+    }
+
+</style>
