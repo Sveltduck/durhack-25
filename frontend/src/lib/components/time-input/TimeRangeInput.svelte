@@ -25,12 +25,16 @@ let values = $state([defaultLower ?? 0, defaultUpper ?? 48]);
             min={0} max={48} step={1}
             range bind:values draggy
             float pips pipstep={6} spring={false} all="label"
+            style="
+                --slider-bg: #555;
+                --range-pip-text: #aaa;
+            "
             formatter={timeNumberToString}
     />
 </div>
 
 <style>
     div {
-        margin: 0 .5em;
+        width: 30em;
     }
 </style>
