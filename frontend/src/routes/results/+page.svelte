@@ -60,6 +60,8 @@ onMount(() => {
 </div>
 
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Lobster+Two:ital,wght@0,400;0,700;1,400;1,700&family=Momo+Signature&display=swap");
+
 :global(body) {
   background-color: black;
 }
