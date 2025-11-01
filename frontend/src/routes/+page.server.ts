@@ -1,5 +1,6 @@
 import type { Actions } from './$types';
 import {prisma} from "$lib/server/prisma";
+import {redirect} from "@sveltejs/kit";
 
 
 
@@ -8,6 +9,7 @@ export const actions = {
         console.log("Attempting to send data")
         const data = await request.formData()
         formToDatabase(data);
+        redirect(303, '/results');
     }
 } satisfies Actions;
 
