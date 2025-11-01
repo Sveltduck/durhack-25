@@ -1,9 +1,40 @@
 from datetime import datetime
 import numpy as np 
 import networkx as nx
+import psycopg2
+
+conn = psycopg2.connect(
+   "postgres://99daed4eb57ee8d15df095e80006a1a2b9d921d26366b67f4ad069055d386ae5:sk_eYTLTQN0oFInIQVT0gM7C@db.prisma.io:5432/postgres?sslmode=require"
+   
+   )
+
+cur=conn.cursor()
+
+
+
+cur.execute('SELECT * FROM "Answers";')
+
+rows=cur.fetchall()
+
+
+
+cur.execute(('SELECT "studentId" FROM "Answers";'))
+ids=cur.fetchall()
+
+ids=[x[0] for x in ids]
+
+
+
+
 
 def overnightGuest(answer1, answer2):
     #that's fine = 2, I'd rather they didn't = 1, no way = 0
+    answer2=answer2[0][0]
+    answer1=answer1[0][0]
+
+    answer1,answer2= {"yes":1,'rather-no':0.5}[answer1], {"yes":1,'rather-no':0.5}[answer2]
+
+    print(answer1)
     if answer1 == answer2:
         return 1
     elif abs(answer1 - answer2) == 1:
@@ -12,9 +43,16 @@ def overnightGuest(answer1, answer2):
         return 0
 
 def textSimilarity(answer1, answer2):
+
+    if type(answer1)==list:
+        answer1 =' '.join(answer1[0][0]).strip()
+        
+    if type(answer2)==list:
+         answer2 =' '.join(answer2[0][0]).strip()
+
     SetAnswer1 = set(answer1.lower().split())
     SetAnswer2 = set(answer2.lower().split())
-    rating = len(SetAnswer1 & SetAnswer2) / len(SetAnswer1 | SetAnswer2)
+    rating = max(len(SetAnswer1 & SetAnswer2),1) /max( len(SetAnswer1 | SetAnswer2),1)
     return rating
 
 def personalityType(answer1, answer2):
@@ -24,6 +62,15 @@ def personalityType(answer1, answer2):
         return 0
 
 def tidiness(tidy1, tidy2, care1, care2):
+   
+    tidy1=tidy1[0][0]
+    tidy2=tidy2[0][0]
+    care1=care1[0][0]
+    care2=care2[0][0]
+
+
+
+
     tidy1 = tidy1 / 5
     tidy2 = tidy2 / 5
     care1 = care1 / 5
@@ -39,10 +86,15 @@ def tidiness(tidy1, tidy2, care1, care2):
 
 
 def minutes(time):
-    time = datetime.strptime(time, '%H:%M')
-    return time.hour * 60 + time.minute
+    
+    
+    #time=str(time[0][0])
 
+    
+   
+    return time[0][0]  *30
 def timeSimilarity(time1, time2):
+
     difference = abs(minutes(time1) - minutes(time2))
     difference = min(difference, 1440 - difference)
     difference = 1 - difference / 480
@@ -77,13 +129,121 @@ def timingCompatibility(sleep1, sleep2, wake1, wake2, earliestwork1, earliestwor
     return (result)
 
 def finalCompatibility(person1, person2):
+
+
+
+    cur.execute('SELECT "overnightGuests" FROM "Answers" Where "studentId" =%s;',(person1,))
+    answer1 = cur.fetchall()
+    cur.execute('SELECT "overnightGuests" FROM "Answers" Where "studentId"=%s;',(person2,))
+    answer2 = cur.fetchall()
     guest = overnightGuest(answer1, answer2)
-    music = textSimilarity(musicAnswer1, musicAnswer2)
-    sport = textSimilarity(sportAnswer1, sportAnswer2)
-    personality = personalityType(type1, type2)
+
+    cur.execute('SELECT "musicArtists" FROM "Answers" Where "studentId" =%s;',(person1,))
+    answer1 = cur.fetchall()
+    cur.execute('SELECT "musicArtists" FROM "Answers" Where "studentId"=%s;',(person2,))
+    answer2 = cur.fetchall()
+    musicG = textSimilarity(answer1, answer2)
+
+
+    cur.execute('SELECT "musicGenres" FROM "Answers" Where "studentId" =%s;',(person1,))
+    answer1 = cur.fetchall()
+    cur.execute('SELECT "musicGenres" FROM "Answers" Where "studentId"=%s;',(person2,))
+    answer2 = cur.fetchall()
+    musicA= textSimilarity(answer1, answer2)
+
+    cur.execute('SELECT "sportsWatched" FROM "Answers" Where "studentId" =%s;',(person1,))
+    answer1 = cur.fetchall()
+    cur.execute('SELECT "sportsWatched" FROM "Answers" Where "studentId"=%s;',(person2,))
+    answer2 = cur.fetchall()
+
+
+    sport=textSimilarity(answer1, answer2)
+    cur.execute('SELECT "introvertExtrovert" FROM "Answers" Where "studentId" =%s;',(person1,))
+
+    type1=cur.fetchall()
+
+    type2=cur.execute('SELECT "introvertExtrovert" FROM "Answers" Where "studentId" =%s;',(person2,))
+    personality= personalityType(type1, type2)
+
+
+
+    cur.execute('SELECT "tidiness" FROM "Answers" Where "studentId" =%s;',(person1,))
+    
+    tidy1=cur.fetchall()
+    cur.execute('SELECT "tidiness" FROM "Answers" Where "studentId" =%s;',(person2,))
+    tidy2=cur.fetchall()
+
+
+    
+    cur.execute('SELECT "careAboutTidiness" FROM "Answers" Where "studentId" =%s;',(person1,))
+    
+    care1=cur.fetchall()
+    cur.execute('SELECT "careAboutTidiness" FROM "Answers" Where "studentId" =%s;',(person2,))
+    care2=cur.fetchall()
+
     cleanliness = tidiness(tidy1, tidy2, care1, care2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    cur.execute('SELECT "normalWeekdayBedtime" FROM "Answers" Where "studentId" =%s;',(person1,))
+    sleep1=cur.fetchall()
+
+    cur.execute('SELECT "normalWeekdayStartTime" FROM "Answers" Where "studentId" =%s;',(person1,))
+    wake1=cur.fetchall()
+
+    cur.execute('SELECT "workStartTime" FROM "Answers" Where "studentId" =%s;',(person1,))
+    earliestwork1=cur.fetchall()
+
+    cur.execute('SELECT "workEndTime" FROM "Answers" Where "studentId" =%s;',(person1,))
+    latestwork1=cur.fetchall()
+
+    cur.execute('SELECT "nightOutBedtime" FROM "Answers" Where "studentId" =%s;',(person1,))
+    nightOutsleep1=cur.fetchall()
+
+
+    cur.execute('SELECT "normalWeekdayBedtime" FROM "Answers" Where "studentId" =%s;',(person2,))
+    sleep2=cur.fetchall()
+
+    cur.execute('SELECT "normalWeekdayStartTime" FROM "Answers" Where "studentId" =%s;',(person2,))
+    wake2=cur.fetchall()
+
+    cur.execute('SELECT "workStartTime" FROM "Answers" Where "studentId" =%s;',(person2,))
+    earliestwork2=cur.fetchall()
+
+    cur.execute('SELECT "workEndTime" FROM "Answers" Where "studentId" =%s;',(person2,))
+    latestwork2=cur.fetchall()
+
+    cur.execute('SELECT "nightOutBedtime" FROM "Answers" Where "studentId" =%s;',(person2,))
+    nightOutsleep2=cur.fetchall()
+
     times = timingCompatibility(sleep1, sleep2, wake1, wake2, earliestwork1, earliestwork2, latestwork1, latestwork2, nightOutsleep1, nightOutsleep2)
-    compatibility = (guest + music +sport +personality + cleanliness + times)
+
+
+
+
+    compatibility = (guest + musicG+musicA +sport +personality + cleanliness + times)
     return compatibility
 
 
@@ -99,8 +259,13 @@ def averageMatrix(tab):
             mat[i][j],mat[j][i]=a,a
     return np.array(mat) 
 
-def getRoomates(matrix, entryOrder):
+def getRoomates(matrix, entryOrder=None):
 
+    if entryOrder==None:
+        cur.execute('SELECT "name" from "User"')
+        entryOrder=cur.fetchall()
+        entryOrder=[x[0] for x in entryOrder]
+        
     numbersToNames=dict(zip([x for x in range(len(entryOrder))], entryOrder))
 
 
@@ -108,10 +273,14 @@ def getRoomates(matrix, entryOrder):
     a=nx.max_weight_matching(G, maxcardinality=False)
     named=[]
     for item in a :
-        named.append((numbersToNames[item[0]], numbersToNames[item[1]])    )
+        named.append((numbersToNames[item[0]]+"("+str( ids[item[0]] )+")", numbersToNames[item[1]]+"("+str( ids [item[1]])+")"  )    )
        
-    print(named)
-    return named
+    namedDict={}
+
+    for item in named:
+        namedDict[item[0]]=item[1]
+        namedDict[item[1]]=item[0]
+    return namedDict
 
 def getBestMatches(n,matrix,entryOrder):
     numbersToNames=dict(zip([x for x in range(len(entryOrder))], entryOrder))
@@ -120,24 +289,43 @@ def getBestMatches(n,matrix,entryOrder):
     numsInOrder=sorted(compDict.items(),key=lambda item:item[1],reverse=True)
     numsInOrder=([numbersToNames[x[0]] for x in numsInOrder[:-1]])
     return numsInOrder[:5]
-  
+
+
+
+
 
 def populateMatrix():
     #get size of matrix = n
-    matrix = [[0 for i in range(n)] for j in range(n)]
+    matrix = [[0 for i in range(len(ids))] for j in range(len(ids))]
 
-    for i in range('number of rows'):
-        for j in range('number of rows'):
+    for i in range(len(ids)) :
+        for j  in range(i,len(ids)):
             #get gender
+            person1=ids[i]
+            person2=ids[j]
+
+            cur.execute('SELECT "gender" FROM "Answers" Where "studentId" =%s;',(person1,))
+            genderi=cur.fetchall()
+
+            cur.execute('SELECT "gender" FROM "Answers" Where "studentId" =%s;',(person2,))
+            genderj=cur.fetchall()
+
+
             if i == j:
                 matrix[i][j] = 0
-            elif 'student[i]'s gender != student[j]'s gender':
+            elif genderi!= genderj:
                 matrix[i][j] = 0
             else:
-                comp = finalCompatibility(student[i], student[j])
+                comp = finalCompatibility(person1, person2)
                 matrix[i][j] = comp
+                matrix[j][i] = comp
+
+    return matrix
 
 
+
+
+print(getRoomates(populateMatrix()))
 
 
 
