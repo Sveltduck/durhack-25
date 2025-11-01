@@ -122,6 +122,21 @@ def getBestMatches(n,matrix,entryOrder):
     return numsInOrder[:5]
   
 
+def populateMatrix():
+    #get size of matrix = n
+    matrix = [[0 for i in range(n)] for j in range(n)]
+
+    for i in range('number of rows'):
+        for j in range('number of rows'):
+            #get gender
+            if i == j:
+                matrix[i][j] = 0
+            elif 'student[i]'s gender != student[j]'s gender':
+                matrix[i][j] = 0
+            else:
+                comp = finalCompatibility(student[i], student[j])
+                matrix[i][j] = comp
+
 
 
 
