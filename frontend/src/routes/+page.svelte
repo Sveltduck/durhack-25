@@ -7,6 +7,7 @@
 <!-- TODO: In future, submitting details will require authentication -->
 <p>Enter your details below to get started. These details will be used to match you with a compatible roommate.</p>
 <form>
+    <div class = "QBox">
     <h2>Basic Information</h2>
     <label>
         Name:
@@ -30,8 +31,9 @@
             <option value="prefer-not-to-say">Prefer not to say</option>
         </select>
     </label>
+    </div>
 
-
+    <div class = "QBox">
     <h2>Timings</h2>
 
     <label>
@@ -69,7 +71,9 @@
         people staying overnight
     </label>
     <br>
+    </div>
 
+    <div class = "QBox">
     <h2>Personality</h2>
 
     <label>
@@ -135,6 +139,35 @@
         <input type="text" name="music-artists" placeholder="e.g. The Beatles, Beyoncé" />
     </label>
     <br>
+    </div>
 
     <button type="submit">Submit</button>
 </form>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Momo+Trust+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Momo+Trust+Display&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+    :global(body) {
+        background-color: #DEE2B1;
+    }
+
+    h1{
+        text-align:center;
+        color:#155332;
+        font-family: "Momo Trust Display"
+    }
+
+    p, label, h2, select, input {
+        font-family: "Open Sans", sans-serif;
+    }
+
+    p {
+        text-align: center
+    }
+
+    .QBox {
+        border: 20px #155332;
+    }
+
+</style>
