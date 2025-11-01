@@ -63,7 +63,7 @@
         <label>
             I would
             <select name="overnight-guests" required>
-                <option value="" disabled selected>(mind having)</option>
+                <option value="" disabled selected>(mind having?)</option>
                 <option value="yes">be fine with</option>
                 <option value="rather-no">rather avoid</option>
                 <option value="no">not want</option>
@@ -78,7 +78,7 @@
         <label>
             I consider myself to be an
             <select name="introvert-extrovert" required>
-                <option value="" disabled selected>(introvert/extrovert)</option>
+                <option value="" disabled selected>(introvert/extrovert?)</option>
                 <option value="introvert">introvert</option>
                 <option value="ambivert">ambivert</option>
                 <option value="extrovert">extrovert</option>
@@ -90,7 +90,7 @@
         <label>
             I consider myself to be
             <select name="tidiness" required>
-                <option value="" disabled selected>(tidy/messy)</option>
+                <option value="" disabled selected>(tidy/messy?)</option>
                 <option value="5">very tidy</option>
                 <option value="4">somewhat tidy</option>
                 <option value="3">neither tidy nor messy</option>
@@ -103,7 +103,7 @@
         <label>
             I
             <select name="care-about-tidiness" required>
-                <option value="" disabled selected>(care about/don't care about)</option>
+                <option value="" disabled selected>(care about/don't care about?)</option>
                 <option value="5">care a lot about</option>
                 <option value="4">care somewhat about</option>
                 <option value="3">neither care nor don't care about</option>
@@ -192,13 +192,16 @@
     }
 
     input::placeholder,
+    textarea::placeholder,
     select:has(> option[value=""]:checked) {
         color: #c90000;
+        font-style: italic;
     }
 
     button {
         font-size: 1.8em;
         padding: .3em;
+        margin: .3em;
         border-radius: 1em;
     }
 </style>
