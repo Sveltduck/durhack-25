@@ -15,29 +15,31 @@ datasource db {
 
 model User {
   id      Int      @id @default(autoincrement())
-  email   String   @unique
   name    String
   answers Answers?
 }
 
 model Answers {
-  user             User @relation(fields: [userId], references: [id])
-  userId           Int  @unique
-  EarliestWorkTime Int /// Earliest you are likely to work in the room
-  LatestWorkTime   Int /// Latest you are likely to work in the room
+  user      User   @relation(fields: [userId], references: [id])
+  userId    Int    @unique
+  studentId String
 
-  NightOutSleepTime       Int /// On a night out what time would you go to bed
-  QuietWeekdaySleepTime   Int /// On a quiet weekday night what time would you go to bed
-  NormalWeekdayWakeUpTime Int /// On a normal weekday what time do you get up
+  gender String
 
-  RoommateOvernightStay Int /// How do you feel about your roommate having people to stay overnight? (That's fine, I'd rather they didn't, No way)
-  Introverted           Int /// Introvert, Extrovert or not sure
-  SportsWatched         String[] /// What sports do you watch
-  SportsPlayed          String[] /// What sports do you play
-  MusicGenres           String[] /// What music genres do you like
-  MusicArtists          String[] /// What music artists do you like
-  Tidyness              Int /// How tidy are you
-  RoommatesTidyness     Int /// How much do you care about the tidiness of your roommate
-  IdealRoomate          String /// Describe your ideal roommate
-  SelfDescription       String /// Describe how you would be as a roommate
+  workStartTime        Int /// Earliest you are likely to work in the room
+  workEndTime          Int /// Latest you are likely to work in the room
+  nightOutBedtime      Int /// On a night out what time would you go to bed
+  quietWeekdayBedtime  Int /// On a quiet weekday night what time would you go to bed
+  normalWeekdayBedtime Int /// On a normal weekday what time do you get up
+
+  overnightGuests    String /// How do you feel about your roommate having people to stay overnight? (That's fine, I'd rather they didn't, No way)
+  introvertExtrovert String /// Introvert, Extrovert or not sure
+  tidiness           Int /// How tidy are you
+  careAboutTidiness  Int /// How much do you care about the tidiness of your roommate
+  sportsWatched      String[] /// What sports do you watch
+  sportsPlayed       String[] /// What sports do you play
+  musicGenres        String[] /// What music genres do you like
+  musicArtists       String[] /// What music artists do you like
+  idealRoommate      String /// Describe your ideal roommate
+  selfDescription    String /// Describe how you would be as a roommate
 }

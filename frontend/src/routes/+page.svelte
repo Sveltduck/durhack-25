@@ -6,7 +6,7 @@
 <h1>And They Were Roommates</h1>
 <!-- TODO: In future, submitting details will require authentication -->
 <p>Enter your details below to get started. These details will be used to match you with a compatible roommate.</p>
-<form>
+<form method="POST">
     <fieldset>
         <legend>Basic Information</legend>
         <label>
