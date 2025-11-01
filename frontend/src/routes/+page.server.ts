@@ -17,8 +17,8 @@ function formToDatabase(data: FormData): void {
     const workStartTimeString = data.get("work-start") as string;
     const workEndTimeString = data.get("work-end") as string;
     const nightOutBedtimeString = data.get("night-out-bedtime") as string;
-    const quietWeekdayBedtimeString = data.get("quiet-weekday-bedtime") as string;
     const normalWeekdayBedtimeString = data.get("normal-weekday-bedtime") as string;
+    const normalWeekdayStartTimeString = data.get("normal-weekday-waketime") as string;
     const tidinessString = data.get("tidiness") as string;
     const careAboutTidinessString = data.get("care-about-tidiness") as string;
     const sportsWatchedString = data.get("sports-watched") as string;
@@ -32,8 +32,8 @@ function formToDatabase(data: FormData): void {
     const workStartTime = Number.parseInt(workStartTimeString);
     const workEndTime = Number.parseInt(workEndTimeString);
     const nightOutBedtime = Number.parseInt(nightOutBedtimeString);
-    const quietWeekdayBedtime = Number.parseInt(quietWeekdayBedtimeString);
     const normalWeekdayBedtime = Number.parseInt(normalWeekdayBedtimeString);
+    const normalWeekdayStartTime = Number.parseInt(normalWeekdayStartTimeString);
     const overnightGuests = data.get("overnight-guests") as string;
     const introvertExtrovert = data.get("introvert-extrovert") as string;
     const tidiness = Number.parseInt(tidinessString);
@@ -45,6 +45,7 @@ function formToDatabase(data: FormData): void {
     const idealRoommate = data.get("ideal-roommate-description") as string;
     const selfDescription = data.get("self-description") as string;
 
+
     prisma.user.create({
         data: {
             name,
@@ -55,8 +56,8 @@ function formToDatabase(data: FormData): void {
                     workStartTime,
                     workEndTime,
                     nightOutBedtime,
-                    quietWeekdayBedtime,
                     normalWeekdayBedtime,
+                    normalWeekdayStartTime,
                     overnightGuests,
                     introvertExtrovert,
                     tidiness,
