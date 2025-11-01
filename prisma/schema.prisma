@@ -22,7 +22,7 @@ model User {
 model Answers {
   user      User   @relation(fields: [userId], references: [id])
   userId    Int    @unique
-  studentId String
+  studentId String @unique
 
   gender String /// Your gender
 
