@@ -1,6 +1,6 @@
-<script lang="ts">
-
-import HalfHourTimeInput from "$lib/components/HalfHourTimeInput.svelte";
+<script>
+    import TimeRangeInput from "$lib/components/time-input/TimeRangeInput.svelte";
+    import TimeInput from "$lib/components/time-input/TimeInput.svelte";
 </script>
 
 <h1>And They Were Roommates</h1>
@@ -33,31 +33,28 @@ import HalfHourTimeInput from "$lib/components/HalfHourTimeInput.svelte";
 
 
     <h2>Timings</h2>
-    <!-- In future, a lot of these pairs could be combined into a double range slider -->
 
     <label>
         I am likely to only work between
-        <HalfHourTimeInput name="work-start" />
-        and
-        <HalfHourTimeInput name="work-end" />
+        <TimeRangeInput lowerTimeName="work-start" upperTimeName="work-end" />
     </label>
     <br>
 
     <label>
         On a night out I would go to bed at
-        <HalfHourTimeInput name="night-out-bedtime" />
+        <TimeInput name="night-out-bedtime" defaultValue={48} />
     </label>
     <br>
 
     <label>
         On a quiet weekday I would go to bed at
-        <HalfHourTimeInput name="quiet-weekday-bedtime" />
+        <TimeInput name="quiet-weekday-bedtime" defaultValue={42} />
     </label>
     <br>
 
     <label>
         On a normal weekday I would go to bed at
-        <HalfHourTimeInput name="normal-weekday-bedtime" />
+        <TimeInput name="normal-weekday-bedtime" defaultValue={42} />
     </label>
     <br>
 
