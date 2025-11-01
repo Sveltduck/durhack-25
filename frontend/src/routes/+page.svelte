@@ -120,7 +120,7 @@
             <label>
                 I watch the following sports:
                 <br>
-                <FormTagsInput name="sports-watched" placeholder="e.g. football, basketball" />
+                <FormTagsInput name="sports-watched" placeholder="e.g. football" />
             </label>
             <br>
 

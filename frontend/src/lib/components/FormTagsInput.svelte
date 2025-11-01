@@ -1,5 +1,6 @@
 <script lang="ts">
     import Tags from "svelte-tags-input";
+    import {onMount} from "svelte";
 
     let { name, placeholder }: {
         name: string;
@@ -7,7 +8,20 @@
     }= $props();
 
     let tags: string[] = $state([]);
+
+    let inputElement: HTMLInputElement;
+
+    function onTagAdded() {
+        console.log(tags);
+        inputElement.setCustomValidity("");
+    }
+    function onTagRemoved() {
+        if (!tags.length) {
+            inputElement.setCustomValidity("Please enter at least one tag.");
+        }
+    }
+    onMount(onTagRemoved);
 </script>
 
-<input type="hidden" {name} value={JSON.stringify(tags)} />
-<Tags bind:tags {placeholder} allowPaste onlyUnique />
+<input type="text" hidden {name} value={JSON.stringify(tags)} bind:this={inputElement} />
+<Tags bind:tags {placeholder} allowPaste onlyUnique {onTagAdded} {onTagRemoved} />
