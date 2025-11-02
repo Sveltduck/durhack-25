@@ -291,11 +291,7 @@ class MyRequestHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
-            response = json.dumps({
-                "user_id": user_id,
-                "best_match": best_match
-            })
-            self.wfile.write(response.encode("utf-8"))
+            self.wfile.write(best_match.encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()
