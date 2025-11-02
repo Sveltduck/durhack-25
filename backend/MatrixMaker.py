@@ -259,11 +259,17 @@ from urllib.parse import urlparse
 
 def compute_best_match(user_id):
     """Compute compatibility matrix and return best match for given user"""
+    print(f"Computing match for user: {user_id}")
+    print(f"Total users in database: {len(ids)}")
     m = populateMatrix()
+    print(f"Matrix size: {len(m)}x{len(m)}")
     print("calculating best matches")
     if len(m) == 0:
         return None
-    return getRoomates(m).get(user_id, None)
+    roommates = getRoomates(m)
+    print(f"Total pairs found: {len(roommates) // 2}")
+    print(f"All matches: {roommates}")
+    return roommates.get(user_id, None)
 
 
 class MyRequestHandler(BaseHTTPRequestHandler):
