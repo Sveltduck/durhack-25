@@ -1,0 +1,26 @@
+{
+  "name": "roomatefinder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.2",
+    "prisma": "^5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.5.3"
+  },
+  "private": true,
+  "dependencies": {
+    "@prisma/client": "^5",
+    "@prisma/extension-accelerate": "^2.0.2",
+    "dotenv": "^17.2.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client"
+    ]
+  }
+}
