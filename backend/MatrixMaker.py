@@ -1,4 +1,6 @@
 from datetime import datetime
+from urllib.parse import urlparse, parse_qs
+
 import numpy as np
 import networkx as nx
 import psycopg2
@@ -252,45 +254,61 @@ def populateMatrix():
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
-import threading
+from urllib.parse import urlparse
 
 
-def compute_roommates():
+def compute_best_match(user_id):
+    """Compute compatibility matrix and return best match for given user"""
     m = populateMatrix()
-    if len(m) > 0:
-        return getRoomates(m)
-    else:
-        return {}
-
+    print("calculating best matches")
+    if len(m) == 0:
+        return None
+    return getRoomates(m).get(user_id, None)
 
 
 class MyRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path == "/roommates":
+        # Parse the URL path
+        parsed_path = urlparse(self.path)
+        path_parts = parsed_path.path.strip('/').split('/')
+
+        # Check if path starts with "roommate/"
+        if len(path_parts) == 2 and path_parts[0] == "roommate":
+            user_id = path_parts[1]
+
+            # Compute best match
+            best_match = compute_best_match(user_id)
+
+            if best_match is None:
+                self.send_response(404)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                response = json.dumps({"error": "User not found or no matches available"})
+                self.wfile.write(response.encode("utf-8"))
+                return
+
+            # Return successful response
             self.send_response(200)
             self.send_header("Content-type", "application/json")
             self.end_headers()
-
-            # Convert your Python dict to JSON
-            response = json.dumps(compute_roommates())
+            response = json.dumps({
+                "user_id": user_id,
+                "best_match": best_match
+            })
             self.wfile.write(response.encode("utf-8"))
         else:
             self.send_response(404)
             self.end_headers()
             self.wfile.write(b"Not Found")
 
+
 def run_server():
     server = HTTPServer(("0.0.0.0", 8080), MyRequestHandler)
     print("Server started at http://localhost:8080")
+    print("Usage: GET /roommate/<student_id>")
     server.serve_forever()
 
-# Start server in background thread (so your code can still run other things)
-threading.Thread(target=run_server, daemon=True).start()
-
-
-
-
-
-
-
+# Start server in background thread
+if __name__ == "__main__":
+    run_server()
 #need empty matrix size of n where n is number of people
