@@ -15,17 +15,6 @@ cur=conn.cursor()
 
 
 
-cur.execute('SELECT * FROM "Answers";')
-
-rows=cur.fetchall()
-
-
-
-cur.execute(('SELECT "studentId" FROM "Answers";'))
-ids=cur.fetchall()
-
-ids=[x[0] for x in ids]
-
 
 
 
@@ -188,7 +177,7 @@ def averageMatrix(tab):
             mat[i][j],mat[j][i]=a,a
     return np.array(mat)
 
-def getRoomates(matrix, entryOrder=None):
+def getRoomates(matrix,ids,entryOrder=None):
 
     if entryOrder==None:
         cur.execute('SELECT "name" from "User"')
@@ -223,7 +212,7 @@ def getBestMatches(n,matrix,entryOrder):
 
 
 
-def populateMatrix():
+def populateMatrix(ids):
     #get size of matrix = n
     matrix = [[0 for i in range(len(ids))] for j in range(len(ids))]
 
@@ -273,14 +262,20 @@ from urllib.parse import urlparse
 
 def compute_best_match(user_id):
     """Compute compatibility matrix and return best match for given user"""
+    cur.execute('SELECT * FROM "Answers";')
+    cur.execute(('SELECT "studentId" FROM "Answers";'))
+    ids=cur.fetchall()
+    ids=[x[0] for x in ids]
+
+    rows=cur.fetchall()
     print(f"Computing match for user: {user_id}")
     print(f"Total users in database: {len(ids)}")
-    m = populateMatrix()
+    m = populateMatrix(ids)
     print(f"Matrix size: {len(m)}x{len(m)}")
     print("calculating best matches")
     if len(m) == 0:
         return None
-    roommates = getRoomates(m)
+    roommates = getRoomates(m,ids)
     print(f"Total pairs found: {len(roommates) // 2}")
     print(f"All matches: {roommates}")
     roommate_id = roommates.get(user_id, None)
@@ -291,10 +286,13 @@ def compute_best_match(user_id):
                 WHERE a."studentId" = %s;
                 ''', (roommate_id,))
     result = cur.fetchone()
+    if not result:
+        return None
     return {
         "best_match": roommate_id,
         "match_name": result[0]
     }
+
 
 
 
