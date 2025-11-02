@@ -227,18 +227,32 @@ def populateMatrix():
     #get size of matrix = n
     matrix = [[0 for i in range(len(ids))] for j in range(len(ids))]
 
+    curr=conn.cursor(cursor_factory=RealDictCursor)
+    curr.execute('SELECT "studentId","gender" FROM "Answers" ')
+    genders=curr.fetchall()
+
+    genderDict={}
+
+    for item in genders:
+        print(item["gender"])
+        genderDict[item ["studentId"]]   =item["gender"] 
+
+
     for i in range(len(ids)) :
         for j  in range(i,len(ids)):
             #get gender
             person1=ids[i]
             person2=ids[j]
+            
 
-            cur.execute('SELECT "gender" FROM "Answers" Where "studentId" =%s;',(person1,))
-            genderi=cur.fetchall()
+            #cur.execute('SELECT "gender" FROM "Answers" Where "studentId" =%s;',(person1,))
+            #genderi=cur.fetchall()
 
-            cur.execute('SELECT "gender" FROM "Answers" Where "studentId" =%s;',(person2,))
-            genderj=cur.fetchall()
+            #cur.execute('SELECT "gender" FROM "Answers" Where "studentId" =%s;',(person2,))
+            #genderj=cur.fetchall()
 
+            genderi=genderDict[person1]
+            genderj=genderDict[person2]
 
             if i == j:
                 matrix[i][j] = 0
