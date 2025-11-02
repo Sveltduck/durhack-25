@@ -60,7 +60,7 @@ export const actions = {
         const idealRoommate = getString("ideal-roommate-description");
         const selfDescription = getString("self-description");
 
-        prisma.user.create({
+        await prisma.user.create({
             data: {
                 name,
                 answers: {
@@ -85,7 +85,7 @@ export const actions = {
                     }
                 }
             }
-        }).then();
+        });
         redirect(303, '/results');
     }
 } satisfies Actions;
