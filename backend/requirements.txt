@@ -2,3 +2,4 @@ networkx
 psycopg2
 numpy
 python-dotenv
+google-generativeai
