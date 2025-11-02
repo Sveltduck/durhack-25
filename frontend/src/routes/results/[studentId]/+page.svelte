@@ -68,10 +68,10 @@ onMount(() => {
     });
 
     fetch(`${PUBLIC_BACKEND_URL}/roommate/${page.params.studentId}`)
-        .then(response => response.text())
-        .then(roommateName => {
+        .then(response => response.json())
+        .then(response => {
             opacity = 0;
-            resultText = `Your roommate is ${roommateName}`;
+            resultText = `Your roommate is\n ${response.match_name} (student ID: ${response.best_match})`
 
             animationFrameId = requestAnimationFrame(animate);
         })
@@ -89,7 +89,7 @@ onMount(() => {
             alt="Crystal ball"
             src="https://media.istockphoto.com/id/933666298/photo/hands-on-crystal-ball-and-cryptocurrency.jpg?s=612x612&w=0&k=20&c=rWJ_caa0AZCHYB09wkcLRghIYGZmGqfYe8D2l1JNZE8="
     >
-    <p id="result" style:opacity={opacity}>{resultText}</p>
+    <pre id="result" style:opacity={opacity}>{resultText}</pre>
 </div>
 
 <style>
