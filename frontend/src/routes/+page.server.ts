@@ -8,7 +8,7 @@ export const actions = {
     default: async ({request}) => {
         console.log("Attempting to send data")
         const data = await request.formData()
-        formToDatabase(data);
+        await formToDatabase(data);
         redirect(303, '/results');
     }
 } satisfies Actions;
@@ -26,6 +26,7 @@ function parseList(data: FormDataEntryValue | null) {
     try {
         jsonData = JSON.parse(data as string);
     } catch {
+        console.log(data);
         error(403, "Invalid data")
     }
     if (!Array.isArray(jsonData)) {
@@ -33,7 +34,7 @@ function parseList(data: FormDataEntryValue | null) {
     }
     for (const item of jsonData) {
         if (typeof item !== "string") {
-            error(403, "Invalid data")
+            error(403, "Invalid data: string list contains non string value")
         }
     }
     return jsonData;
@@ -47,7 +48,7 @@ function parseString(data: FormDataEntryValue | null) {
     return str;
 }
 
-function formToDatabase(data: FormData): void {
+async function formToDatabase(data: FormData): Promise<void> {
     const name = parseString(data.get("name"))
     const studentId = parseString(data.get("student-id"))
     const gender = parseString(data.get("gender"))
@@ -67,32 +68,35 @@ function formToDatabase(data: FormData): void {
     const idealRoommate = parseString(data.get("ideal-roommate-description"))
     const selfDescription = parseString(data.get("self-description"))
 
-
-    prisma.user.create({
-        data: {
-            name,
-            answers: {
-                create: {
-                    studentId,
-                    gender,
-                    workStartTime,
-                    workEndTime,
-                    nightOutBedtime,
-                    normalWeekdayBedtime,
-                    normalWeekdayStartTime,
-                    overnightGuests,
-                    introvertExtrovert,
-                    tidiness,
-                    careAboutTidiness,
-                    sportsWatched,
-                    sportsPlayed,
-                    musicGenres,
-                    musicArtists,
-                    idealRoommate,
-                    selfDescription,
+    try {
+        await prisma.user.create({
+            data: {
+                name,
+                answers: {
+                    create: {
+                        studentId,
+                        gender,
+                        workStartTime,
+                        workEndTime,
+                        nightOutBedtime,
+                        normalWeekdayBedtime,
+                        normalWeekdayStartTime,
+                        overnightGuests,
+                        introvertExtrovert,
+                        tidiness,
+                        careAboutTidiness,
+                        sportsWatched,
+                        sportsPlayed,
+                        musicGenres,
+                        musicArtists,
+                        idealRoommate,
+                        selfDescription,
+                    }
                 }
             }
-        }
-    }).then()
+        })
+    } catch {
+        error(403, "Invalid data")
+    }
     console.log("data sent");
 }
