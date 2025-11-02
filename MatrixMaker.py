@@ -199,7 +199,7 @@ def getRoomates(matrix, entryOrder=None):
     a=nx.max_weight_matching(G, maxcardinality=False)
     named=[]
     for item in a :
-        named.append((numbersToNames[item[0]]+"("+str( ids[item[0]] )+")", numbersToNames[item[1]]+"("+str( ids [item[1]])+")"  )    )
+        named.append((str( ids[item[0]] ), str( ids [item[1]])  )    )
        
     namedDict={}
     print(named)
@@ -249,13 +249,42 @@ def populateMatrix():
     return matrix
 
 
-m=populateMatrix()
-if len(m)>0:
-
-    print(getRoomates(m))
-
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import json
+import threading
 
 
+def compute_roommates():
+    m = populateMatrix()
+    if len(m) > 0:
+        return getRoomates(m)
+    else:
+        return {}
+
+
+
+class MyRequestHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == "/roommates":
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            
+            # Convert your Python dict to JSON
+            response = json.dumps(compute_roommates())
+            self.wfile.write(response.encode("utf-8"))
+        else:
+            self.send_response(404)
+            self.end_headers()
+            self.wfile.write(b"Not Found")
+
+def run_server():
+    server = HTTPServer(("0.0.0.0", 8080), MyRequestHandler)
+    print("Server started at http://localhost:8080")
+    server.serve_forever()
+
+# Start server in background thread (so your code can still run other things)
+threading.Thread(target=run_server, daemon=True).start()
 
 
 
