@@ -80,7 +80,7 @@ onMount(() => {
 </script>
 
 <h1>Results</h1>
-<p id="toptext">Leave a great Legacy</p>
+<p id="toptext">No better legacy than a friendship.</p>
 <div id="main">
     <img
             onmousemove={onMouseMove}
