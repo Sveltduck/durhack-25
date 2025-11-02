@@ -1,6 +1,8 @@
 <script lang="ts">
 import {onMount} from "svelte";
 
+// TODO: Loading state, fetch data from Python server before allowing reveal
+
 let opacity = 0;
 
 const SPEED_MULTIPLIER = 1;

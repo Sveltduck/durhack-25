@@ -2,6 +2,7 @@
     import TimeRangeInput from "$lib/components/time-input/TimeRangeInput.svelte";
     import TimeInput from "$lib/components/time-input/TimeInput.svelte";
     import BackgroundMist from "$lib/media/background-mist.jpg"
+    import FormTagsInput from "$lib/components/FormTagsInput.svelte";
 </script>
 
 <div id="container" style="background-image: url({BackgroundMist});">
@@ -116,32 +117,31 @@
             </label>
             <br>
 
-            <!-- In future, these multi-text inputs could be tag-style inputs -->
             <label>
-                I watch the following sports: (separate with commas)
+                I watch the following sports:
                 <br>
-                <input type="text" name="sports-watched" placeholder="e.g. football, basketball" />
+                <FormTagsInput name="sports-watched" placeholder="e.g. football" />
             </label>
             <br>
 
             <label>
-                I play the following sports: (separate with commas)
+                I play the following sports:
                 <br>
-                <input type="text" name="sports-played" placeholder="e.g. tennis, swimming" />
+                <FormTagsInput name="sports-played" placeholder="e.g. tennis" />
             </label>
             <br>
 
             <label>
-                I like the following music genres: (separate with commas)
+                I like the following music genres:
                 <br>
-                <input type="text" name="music-genres" placeholder="e.g. rock, classical" />
+                <FormTagsInput name="music-genres" placeholder="e.g. rock" />
             </label>
             <br>
 
             <label>
-                I like the following music artists: (separate with commas)
+                I like the following music artists:
                 <br>
-                <input type="text" name="music-artists" placeholder="e.g. The Beatles, Beyoncé" />
+                <FormTagsInput name="music-artists" placeholder="e.g. The Beatles" />
             </label>
             <br>
 

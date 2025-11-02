@@ -3,72 +3,63 @@ import {prisma} from "$lib/server/prisma";
 import {redirect} from "@sveltejs/kit";
 import {error} from "@sveltejs/kit";
 
-
 export const actions = {
     default: async ({request}) => {
-        console.log("Attempting to send data")
-        const data = await request.formData()
-        await formToDatabase(data);
-        redirect(303, '/results');
-    }
-} satisfies Actions;
+        const data = await request.formData();
 
-function parseNum(data: FormDataEntryValue | null) {
-    const num = Number.parseInt(data as string);
-    if (isNaN(num)) {
-        error(403,"Invalid number")
-    }
-    return num
-}
-
-function parseList(data: FormDataEntryValue | null) {
-    let jsonData: any
-    try {
-        jsonData = JSON.parse(data as string);
-    } catch {
-        console.log(data);
-        error(403, "Invalid data")
-    }
-    if (!Array.isArray(jsonData)) {
-        error(403, "Invalid data")
-    }
-    for (const item of jsonData) {
-        if (typeof item !== "string") {
-            error(403, "Invalid data: string list contains non string value")
+        function getNum(key: string) {
+            const num = Number.parseInt(data.get(key) as string);
+            if (isNaN(num)) {
+                error(403,"Invalid number");
+            }
+            return num;
         }
-    }
-    return jsonData;
-}
 
-function parseString(data: FormDataEntryValue | null) {
-    const str = data as string;
-    if (str == null) {
-        error(403,"Invalid string")
-    }
-    return str;
-}
+        function getTags(key: string) {
+            let jsonData: any;
+            try {
+                jsonData = JSON.parse(data.get(key) as string);
+            } catch {
+                error(403, "Invalid data");
+            }
+            if (!Array.isArray(jsonData)) {
+                error(403, "Invalid data");
+            }
+            for (const item of jsonData) {
+                if (typeof item !== "string") {
+                    error(403, "Invalid data");
+                }
+            }
+            return jsonData;
+        }
 
-async function formToDatabase(data: FormData): Promise<void> {
-    const name = parseString(data.get("name"))
-    const studentId = parseString(data.get("student-id"))
-    const gender = parseString(data.get("gender"))
-    const workStartTime = parseNum(data.get("work-start"));
-    const workEndTime = parseNum(data.get("work-end"));
-    const nightOutBedtime = parseNum(data.get("night-out-bedtime"));
-    const normalWeekdayBedtime = parseNum(data.get("normal-weekday-bedtime"));
-    const normalWeekdayStartTime = parseNum(data.get("normal-weekday-waketime"));
-    const overnightGuests = parseString(data.get("overnight-guests"))
-    const introvertExtrovert = parseString(data.get("introvert-extrovert"))
-    const tidiness = parseNum(data.get("care-about-tidiness"));
-    const careAboutTidiness = parseNum(data.get("tidiness"));
-    const sportsWatched = parseList(data.get("sports-watched"));
-    const sportsPlayed = parseList(data.get("sports-played"));
-    const musicGenres = parseList(data.get("music-genres"));
-    const musicArtists = parseList(data.get("music-artists"));
-    const idealRoommate = parseString(data.get("ideal-roommate-description"))
-    const selfDescription = parseString(data.get("self-description"))
+        function getString(key: string) {
+            const str = data.get(key) as string | null;
+            if (str == null) {
+                error(403,"Invalid string");
+            }
+            return str;
+        }
+        
+        const name = getString("name");
+        const studentId = getString("student-id");
+        const gender = getString("gender");
+        const workStartTime = getNum("work-start");
+        const workEndTime = getNum("work-end");
+        const nightOutBedtime = getNum("night-out-bedtime");
+        const normalWeekdayBedtime = getNum("normal-weekday-bedtime");
+        const normalWeekdayStartTime = getNum("normal-weekday-waketime");
+        const overnightGuests = getString("overnight-guests");
+        const introvertExtrovert = getString("introvert-extrovert");
+        const tidiness = getNum("care-about-tidiness");
+        const careAboutTidiness = getNum("tidiness");
+        const sportsWatched = getTags("sports-watched");
+        const sportsPlayed = getTags("sports-played");
+        const musicGenres = getTags("music-genres");
+        const musicArtists = getTags("music-artists");
+        const idealRoommate = getString("ideal-roommate-description");
+        const selfDescription = getString("self-description");
 
-    try {
         await prisma.user.create({
             data: {
                 name,
@@ -94,9 +85,7 @@ async function formToDatabase(data: FormData): Promise<void> {
                     }
                 }
             }
-        })
-    } catch {
-        error(403, "Invalid data")
+        });
+        redirect(303, '/results');
     }
-    console.log("data sent");
-}
+} satisfies Actions;
