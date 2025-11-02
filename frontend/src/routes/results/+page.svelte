@@ -1,64 +1,83 @@
 <script lang="ts">
-import {onMount} from "svelte";
+import { onMount, onDestroy } from "svelte";
 
 // TODO: Loading state, fetch data from Python server before allowing reveal
 
 let opacity = 0;
 
 const SPEED_MULTIPLIER = 1;
+const DECAY_FACTOR = 0.97; // Gentle decay per frame
+const SPEED_THRESHOLD = 0.3; // Minimum speed to count
 
-let lastX = 0;
-let lastY = 0;
-let revealScore = 0;
-let lastTime = Date.now();
+let mouseX: number
+let mouseY: number;
+let lastX: number
+let lastY: number;
+let lastTime: DOMHighResTimeStamp;
+let animationFrameId: number;
 
-let animationInterval: NodeJS.Timeout;
-
-function onMouseMove(event: MouseEvent) {
-    if (!animationInterval) return; // already fully revealed
-
-    const now = Date.now();
-    const dt = now - lastTime || 16; // fallback to ~60fps interval
-
-    const dx = event.clientX - lastX;
-    const dy = event.clientY - lastY;
-    const speed = Math.sqrt(dx * dx + dy * dy) / dt;
-
-    // Increase score while moving quickly
-    if (speed > 0.3) {
-        revealScore += speed * SPEED_MULTIPLIER;
+function animate() {
+    if (mouseX === undefined || mouseY === undefined) {
+        // The mouse hasn't entered the area yet
+        animationFrameId = requestAnimationFrame(animate);
+        return;
     }
 
-    // clamp
-    revealScore = Math.min(Math.max(revealScore, 0), 100);
+    const now = performance.now();
+    if (lastTime !== undefined) {
+        // Calculate mouse speed since the last frame
+        const dt = now - lastTime;
+        const dx = mouseX - lastX;
+        const dy = mouseY - lastY;
+        const speed = Math.sqrt(dx * dx + dy * dy) / (dt || 1);
 
-    lastX = event.clientX;
-    lastY = event.clientY;
+        // Increase opacity based on speed
+        if (speed > SPEED_THRESHOLD) {
+            opacity += speed * SPEED_MULTIPLIER / 100;
+        }
+
+        // Apply a gentle decay on every frame so the user must keep moving
+        opacity *= DECAY_FACTOR;
+    }
+
+    // Update state for the next frame's calculation
+    lastX = mouseX;
+    lastY = mouseY;
     lastTime = now;
+
+    if (opacity >= 1) {
+        // Once fully visible, lock it in
+        opacity = 1;
+    } else {
+        // Until fully visible, keep animating
+        animationFrameId = requestAnimationFrame(animate);
+    }
+}
+
+function onMouseMove(event: MouseEvent) {
+    mouseX = event.clientX;
+    mouseY = event.clientY;
 }
 
 onMount(() => {
-    // Animation loop — fade in until fully revealed
-    animationInterval = setInterval(() => {
-        // gentle decay so user must keep moving to build score
-        opacity = Math.min(revealScore / 100, 1);
+    animationFrameId = requestAnimationFrame(animate);
 
-        revealScore *= 0.97;
-        if (revealScore < 0.01) revealScore = 0;
-
-        // Once fully visible, lock it in
-        if (opacity >= 1) {
-            clearInterval(animationInterval);
-        }
-    }, 50);
+    onDestroy(() => {
+        cancelAnimationFrame(animationFrameId);
+    });
 });
 </script>
 
 <h1>Results</h1>
 <p id="toptext">Leave a great Legacy</p>
 <div id="main">
-  <img onmousemove={onMouseMove} id="crystalBall" alt="Crystal ball" src="https://media.istockphoto.com/id/933666298/photo/hands-on-crystal-ball-and-cryptocurrency.jpg?s=612x612&w=0&k=20&c=rWJ_caa0AZCHYB09wkcLRghIYGZmGqfYe8D2l1JNZE8=">
-  <p id="result" style:opacity={opacity}>This is your Roommate!</p>
+    <img
+            onmousemove={onMouseMove}
+            id="crystalBall"
+            alt="Crystal ball"
+            src="https://media.istockphoto.com/id/933666298/photo/hands-on-crystal-ball-and-cryptocurrency.jpg?s=612x612&w=0&k=20&c=rWJ_caa0AZCHYB09wkcLRghIYGZmGqfYe8D2l1JNZE8="
+    >
+    <p id="result" style:opacity={opacity}>This is your Roommate!</p>
 </div>
 
 <style>
@@ -78,11 +97,11 @@ h1{
 
 #toptext {
     color: white;
-    text-align:center;
+    text-align: center;
     font-family: "Momo Signature", cursive;
-    font-size:15px;
-    margin:5px;
-} 
+    font-size: 15px;
+    margin: 5px;
+}
 
 #main {
   position: relative;
@@ -92,7 +111,6 @@ h1{
 #crystalBall {
   width: 52%;
   height: 52%;
-  display: block;
   margin: auto;
   cursor: pointer;
 }
@@ -107,7 +125,5 @@ h1{
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 </style>
