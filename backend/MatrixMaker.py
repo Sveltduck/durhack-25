@@ -281,19 +281,21 @@ class MyRequestHandler(BaseHTTPRequestHandler):
 
             if best_match is None:
                 self.send_response(404)
-                self.send_header("Content-type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
                 self.end_headers()
-                response = json.dumps({"error": "User not found or no matches available"})
+                response = "error: User not found or no matches available"
                 self.wfile.write(response.encode("utf-8"))
                 return
 
             # Return successful response
             self.send_response(200)
-            self.send_header("Content-type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+
             self.end_headers()
             self.wfile.write(best_match.encode("utf-8"))
         else:
             self.send_response(404)
+            self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
             self.wfile.write(b"Not Found")
 
