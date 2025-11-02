@@ -279,7 +279,7 @@ def compute_best_match(user_id):
     result = cur.fetchone()
     return {
         "best_match": roommate_id,
-        "match_name": result
+        "match_name": result[0]
     }
 
 
