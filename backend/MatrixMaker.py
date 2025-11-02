@@ -269,7 +269,19 @@ def compute_best_match(user_id):
     roommates = getRoomates(m)
     print(f"Total pairs found: {len(roommates) // 2}")
     print(f"All matches: {roommates}")
-    return roommates.get(user_id, None)
+    roommate_id = roommates.get(user_id, None)
+    cur.execute('''
+                SELECT u.name
+                FROM "User" u
+                         JOIN "Answers" a ON u.id = a."userId"
+                WHERE a."studentId" = %s;
+                ''', (roommate_id,))
+    result = cur.fetchone()
+    return {
+        "best_match": roommate_id,
+        "match_name": result
+    }
+
 
 
 class MyRequestHandler(BaseHTTPRequestHandler):
@@ -296,9 +308,12 @@ class MyRequestHandler(BaseHTTPRequestHandler):
             # Return successful response
             self.send_response(200)
             self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Content-type", "application/json")
 
             self.end_headers()
-            self.wfile.write(best_match.encode("utf-8"))
+            response = json.dumps(best_match)
+            print(response)
+            self.wfile.write(response.encode("utf-8"))
         else:
             self.send_response(404)
             self.send_header("Access-Control-Allow-Origin", "*")
