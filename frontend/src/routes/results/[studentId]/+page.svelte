@@ -75,6 +75,9 @@ onMount(() => {
 
             animationFrameId = requestAnimationFrame(animate);
         })
+        .catch(() => {
+            resultText = `Your future roommate\nhas yet to arrive.\nTry again later!`;
+        });
 
 });
 </script>
