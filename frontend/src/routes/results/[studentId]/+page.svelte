@@ -1,20 +1,21 @@
 <script lang="ts">
 import { onMount, onDestroy } from "svelte";
+import { page } from '$app/state';
+import { PUBLIC_BACKEND_URL } from '$env/static/public';
 
-// TODO: Loading state, fetch data from Python server before allowing reveal
-
-let opacity = 0;
+let opacity = $state(1);
+let resultText = $state("Prophesizing...");
 
 const SPEED_MULTIPLIER = 1;
 const DECAY_FACTOR = 0.97; // Gentle decay per frame
 const SPEED_THRESHOLD = 0.3; // Minimum speed to count
 
-let mouseX: number
-let mouseY: number;
-let lastX: number
-let lastY: number;
+let mouseX: number | undefined;
+let mouseY: number | undefined;
+let lastX: number | undefined;
+let lastY: number | undefined;
 let lastTime: DOMHighResTimeStamp;
-let animationFrameId: number;
+let animationFrameId: number | undefined;
 
 function animate() {
     if (mouseX === undefined || mouseY === undefined) {
@@ -24,7 +25,7 @@ function animate() {
     }
 
     const now = performance.now();
-    if (lastTime !== undefined) {
+    if (lastTime !== undefined && lastX !== undefined && lastY !== undefined) {
         // Calculate mouse speed since the last frame
         const dt = now - lastTime;
         const dx = mouseX - lastX;
@@ -60,11 +61,21 @@ function onMouseMove(event: MouseEvent) {
 }
 
 onMount(() => {
-    animationFrameId = requestAnimationFrame(animate);
-
     onDestroy(() => {
-        cancelAnimationFrame(animationFrameId);
+        if (animationFrameId !== undefined) {
+            cancelAnimationFrame(animationFrameId);
+        }
     });
+
+    fetch(`${PUBLIC_BACKEND_URL}/roommate/${page.params.studentId}`)
+        .then(response => response.text())
+        .then(roommateName => {
+            opacity = 0;
+            resultText = `Your roommate is ${roommateName}`;
+
+            animationFrameId = requestAnimationFrame(animate);
+        })
+
 });
 </script>
 
@@ -73,11 +84,12 @@ onMount(() => {
 <div id="main">
     <img
             onmousemove={onMouseMove}
+            onmouseleave={() => {mouseX = undefined; mouseY = undefined;}}
             id="crystalBall"
             alt="Crystal ball"
             src="https://media.istockphoto.com/id/933666298/photo/hands-on-crystal-ball-and-cryptocurrency.jpg?s=612x612&w=0&k=20&c=rWJ_caa0AZCHYB09wkcLRghIYGZmGqfYe8D2l1JNZE8="
     >
-    <p id="result" style:opacity={opacity}>This is your Roommate!</p>
+    <p id="result" style:opacity={opacity}>{resultText}</p>
 </div>
 
 <style>

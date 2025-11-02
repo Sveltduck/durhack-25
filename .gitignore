@@ -1,4 +1,4 @@
 /node_modules
 /.idea
 /generated/prisma
-/.env
+.env

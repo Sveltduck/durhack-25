@@ -84,8 +84,8 @@ export const actions = {
                         selfDescription,
                     }
                 }
-            }
+            },
         });
-        redirect(303, '/results');
+        redirect(303, '/results/' + studentId);
     }
 } satisfies Actions;
