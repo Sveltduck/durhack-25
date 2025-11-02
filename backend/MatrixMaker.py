@@ -199,7 +199,7 @@ def getRoomates(matrix, entryOrder=None):
 
 
     G=nx.from_numpy_array(averageMatrix(matrix))
-    a=nx.max_weight_matching(G, maxcardinality=False)
+    a=nx.max_weight_matching(G, maxcardinality=True)
     named=[]
     for item in a :
         named.append((str( ids[item[0]] ), str( ids [item[1]])  )    )
